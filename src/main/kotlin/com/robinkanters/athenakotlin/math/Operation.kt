@@ -1,0 +1,7 @@
+package com.robinkanters.athenakotlin.math
+
+interface Operation {
+    val symbol: Char
+
+    fun calculate(left: Double, right: Double): Double
+}
