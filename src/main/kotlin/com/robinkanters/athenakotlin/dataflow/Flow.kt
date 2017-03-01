@@ -6,20 +6,17 @@ import com.robinkanters.athenakotlin.dataflow.component.FlowVariablesImpl
 
 import java.util.ArrayList
 
-open class Flow : FlowComponent {
-    protected var components: MutableList<FlowComponent> = ArrayList()
+open class Flow(var components: MutableList<FlowComponent>) : FlowComponent {
+    constructor(vararg components: FlowComponent) : this(ArrayList<FlowComponent>()) {
+        this.components.addAll(components)
+    }
 
     fun run(payload: String): String {
         return run(payload, FlowVariablesImpl())
     }
 
     override fun run(payload: String, flowVariables: FlowVariables): String {
-        var mutablePayload = payload
-
-        for (component in components)
-            mutablePayload = component.run(mutablePayload, flowVariables)
-
-        return mutablePayload
+        return FlowRunner(flowVariables).run(payload, components)
     }
 
     fun addComponent(flowComponent: FlowComponent) {

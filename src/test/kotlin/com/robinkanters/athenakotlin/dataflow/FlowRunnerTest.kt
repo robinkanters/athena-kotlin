@@ -10,41 +10,33 @@ import org.junit.Test
 
 import org.junit.Assert.assertEquals
 
-class FlowTest {
-    val flow: Flow = Flow()
-
+class FlowRunnerTest {
     @Test
     fun passingEmptyStringIntoEmptyFlow_ReturnsEmptyString() {
-        assertEquals("", flow.run(""))
+        assertEquals("", Flow().run(""))
     }
 
     @Test
     fun passingNonEmptyStringIntoEmptyFlow_ReturnsThatStringUnmodified() {
-        assertEquals("Foo", flow.run("Foo"))
+        assertEquals("Foo", Flow().run("Foo"))
     }
 
     @Test
     fun flowWithEchoComponentReturnsStringEqualToInput() {
         val spy = PrintStreamSpy()
 
-        flow.addComponent(EchoComponent(spy))
-        val output = flow.run("Foo")
+        val output = FlowRunner().run("Foo", EchoComponent(spy))
 
         assertEquals("Foo", output)
         assertEquals("Foo\n", spy.print)
     }
 
     @Test
-    fun canHaveSubFlows() {
-        val subflow = Flow()
+    fun canRunSubFlows() {
         val spyExpectsFoo = SpyComponent()
         val spyExpectsBar = SpyComponent()
 
-        flow.addComponent(subflow)
-        subflow.addComponent(spyExpectsFoo)
-        flow.addComponent(spyExpectsBar)
-
-        val flowOutput = flow.run("foo")
+        val flowOutput = FlowRunner().run("foo", Flow(spyExpectsFoo), spyExpectsBar)
 
         assertEquals("foo\n", spyExpectsFoo.trace)
         assertEquals("bar\n", spyExpectsBar.trace)
